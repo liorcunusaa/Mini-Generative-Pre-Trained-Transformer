@@ -11,16 +11,15 @@ print("CUDA available:", torch.cuda.is_available())
 print("GPU name:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "None")
 
 corpus = [
-    "hello everyone, welcome to the world of transformers",
+    "hello everyone, good morning",
     "the tea is very hot",
-    "my name is Aarohi",
-    "the roads of Delhi are busy",
-    "it is raining in Mumbai",
+    "my name is lisa",
+    "the roads of Unesa are busy",
+    "it is raining in",
     "the train is late again",
-    "i love eating samosas and drinking tea",
-    "holi is my favorite festival",
-    "diwali brings lights and sweets",
-    "india won the cricket match"
+    "i love a rainy day",
+    "i love eating seblak and drinking matcha",
+    "Persebaya is a football club from Surabaya"
 ]
 
 corpus = [s + " <END>" for s in corpus]
