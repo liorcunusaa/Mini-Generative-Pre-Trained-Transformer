@@ -57,9 +57,9 @@ embedding_dim = 32
 n_heads = 2  
 n_layers = 2 
 lr = 1e-3 
-epochs = 1500  
+epochs = 200  # SHORTER FOR TESTING
 batch_size = 16
-eval_interval = 100  # Evaluasi setiap 100 steps
+eval_interval = 20  # SHORTER INTERVAL
 
 # ===== TRAIN/VAL SPLIT =====
 split_idx = int(0.8 * len(data))  # 80% train, 20% val
@@ -76,7 +76,7 @@ def get_batch(data_split='train', batch_size=16):
     y = torch.stack([current_data[i+1:i+block_size+1] for i in ix]) 
     return x.to(device), y.to(device)
 
-def compute_loss(data_split='val', num_batches=10):
+def compute_loss(data_split='val', num_batches=5):
     """Compute average loss pada dataset"""
     total_loss = 0.0
     model.eval()
@@ -135,6 +135,7 @@ class TinyGPT(nn.Module):
         self.load_state_dict(torch.load(filepath, map_location=device))
         print(f"Model loaded from {filepath}")
 
+# ===== INITIALIZE MODEL =====
 model = TinyGPT().to(device)
 optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
 
@@ -144,7 +145,7 @@ val_losses = []
 steps = []
 
 print("\n" + "="*50)
-print("STARTING TRAINING")
+print("STARTING TRAINING (QUICK TEST)")
 print("="*50)
 
 for step in range(epochs):
@@ -160,13 +161,11 @@ for step in range(epochs):
     
     # Evaluation step
     if step % eval_interval == 0:
-        val_loss = compute_loss('val', num_batches=5)
+        val_loss = compute_loss('val', num_batches=3)
         val_losses.append(val_loss)
         steps.append(step)
         
         print(f"Step {step:4d} | Train Loss: {loss.item():.4f} | Val Loss: {val_loss:.4f}")
-    elif step % 300 == 0:
-        print(f"Step {step:4d} | Train Loss: {loss.item():.4f}")
 
 # ===== SAVE MODEL & VOCAB =====
 print("\n" + "="*50)
@@ -205,6 +204,11 @@ plt.savefig(str(plot_path), dpi=150, bbox_inches='tight')
 print(f"Training curve saved to {plot_path}")
 plt.close()
 
+print(f"\n Files created:")
+print(f"   - Model: {model_path}")
+print(f"   - Vocab: {vocab_path}")
+print(f"   - Plot: {plot_path}")
+
 # ===== INFERENCE =====
 print("\n" + "="*50)
 print("GENERATING TEXT")
@@ -215,3 +219,5 @@ out = model.generate(context, max_new_tokens=15)
 
 print("\nGenerated text:")
 print(" ".join(idx2word[int(i)] for i in out[0]))
+
+print("\n QUICK TEST COMPLETED SUCCESSFULLY!")
