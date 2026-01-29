@@ -58,8 +58,6 @@ def get_batch(batch_size=16):
     return x, y
 
 
-
-
 class TinyGPT(nn.Module):
     def __init__(self):
         super().__init__()

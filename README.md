@@ -181,6 +181,29 @@ corpus = [
 ]
 ```
 
+## **Catatan : (batch_size, get_batch, context, embedding, lr, epochs)**
+
+- **`batch_size = 16`**: artinya setiap langkah update optimizer akan menggunakan 16 contoh (16 urutan) sekaligus. Ini mengontrol berapa banyak urutan yang diproses dalam satu forward/backward pass.
+
+- **`epochs = 1500` dan `lr = 1e-3`**: Anda akan melatih model selama 1500 epoch dengan learning rate 0.001. Learning rate memengaruhi seberapa besar langkah pembaruan parameter setiap iterasi.
+
+- **`block_size = 6` (context length)**: saat model menghasilkan token berikutnya, ia hanya melihat 6 token terakhir (context window). Ini menentukan panjang konteks yang digunakan untuk prediksi.
+
+- **`embedding_dim = 32`**: setiap token diwakili oleh vektor embedding berdimensi 32.
+
+- \*\*Penjelasan fungsi `get_batch()`:
+  - Panjang data: misalnya `len(data) = 62`.
+  - Jumlah kemungkinan indeks awal untuk potongan sepanjang `block_size` adalah `len(data) - block_size`. Dengan contoh di atas ini menjadi `62 - 6 = 56`, yaitu indeks mulai `0..55`.
+  - Baris `ix = torch.randint(len(data) - block_size, (batch_size,))` memilih `batch_size` daftar indeks acak (mis. 16 angka), tiap angka adalah indeks awal untuk sebuah urutan sepanjang `block_size`.
+  - Untuk setiap indeks awal `i` yang dipilih, input `x` diambil sebagai `data[i:i+block_size]` (6 token), dan target `y` diambil sebagai `data[i+1:i+block_size+1]` (shifted by one) sehingga model belajar memprediksi token berikutnya pada setiap posisi.
+  - Hasilnya: Mendapatkan `batch_size` urutan masukan (`x`) dan `batch_size` urutan target (`y`) untuk satu langkah pelatihan.
+
+- **Contoh konkret**: jika salah satu indeks acak adalah `12`, maka input adalah token pada posisi `[12,13,14,15,16,17]` (6 token) dan targetnya `[13,14,15,16,17,18]`.
+
+- **Alasan pengambilan indeks acak**: untuk membuat batch beragam antar-iterasi sehingga model melihat banyak potongan kontekstual berbeda selama training.
+
+Tambahkan ringkasan ini sebagai catatan pembelajaran jika Anda ingin menjelaskan bagian `get_batch()` dan hyperparameter dasar kepada pembaca atau peserta pelatihan.
+
 ## Penjelasan Algoritma
 
 ### Self-Attention Mechanism
@@ -258,38 +281,6 @@ hello everyone good morning the roads of Unesa are busy the train is late
 | `lr`            | Learning rate untuk optimizer                    | 1e-3    |
 | `epochs`        | Jumlah iterasi training                          | 1500    |
 | `batch_size`    | Ukuran batch dalam `get_batch()`                 | 16      |
-
-## Improvement dan Saran
-
-Untuk meningkatkan performa model:
-
-1. **Tambah Data**: Gunakan corpus yang lebih besar dan bervariasi
-2. **Tune Hyperparameter**: Eksperimen dengan embedding_dim, n_heads, dan n_layers
-3. **Validation Set**: Buat validation loop untuk monitor overfitting
-4. **Checkpointing**: Simpan model checkpoint selama training
-5. **Learning Rate Scheduling**: Gunakan learning rate scheduler untuk convergence lebih baik
-6. **Dropout**: Tambahkan dropout layers untuk regularisasi
-7. **Beam Search**: Implementasi beam search untuk generasi teks yang lebih baik
-
-## Debugging
-
-### Model Tidak Konvergen
-
-- Cek learning rate, coba kurangi atau naikkan
-- Pastikan data sudah di-normalize dengan benar
-- Cek gradient flow dengan gradient clipping
-
-### GPU Memory Issues
-
-- Kurangi batch_size
-- Kurangi embedding_dim atau n_layers
-- Gunakan gradient accumulation
-
-### Poor Generation Quality
-
-- Tingkatkan corpus size
-- Tambah epochs
-- Tingkatkan model capacity (embedding_dim, n_layers)
 
 ## Referensi
 
