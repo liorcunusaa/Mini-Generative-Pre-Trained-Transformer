@@ -191,7 +191,7 @@ corpus = [
 
 - **`embedding_dim = 32`**: setiap token diwakili oleh vektor embedding berdimensi 32.
 
-- \*\*Penjelasan fungsi `get_batch()`\*\*:
+- **Penjelasan fungsi `get_batch()`**:
   - Panjang data: misalnya `len(data) = 62`.
   - Jumlah kemungkinan indeks awal untuk potongan sepanjang `block_size` adalah `len(data) - block_size`. Dengan contoh di atas ini menjadi `62 - 6 = 56`, yaitu indeks mulai `0..55`.
   - Baris `ix = torch.randint(len(data) - block_size, (batch_size,))` memilih `batch_size` daftar indeks acak (mis. 16 angka), tiap angka adalah indeks awal untuk sebuah urutan sepanjang `block_size`.
